@@ -34,6 +34,80 @@ function updateFollower() {
 }
 updateFollower();
 
+// Translations Data
+const translations = {
+    en: {
+        nav_artist: "The Artist",
+        nav_expertise: "Expertise",
+        nav_process: "Process",
+        nav_inquiry: "Inquiry",
+        hero_tag: "Est. MMXIV",
+        hero_h1: "The Art of <br><span class=\"accent-text\">Precision</span>",
+        hero_p: "High-end visual engineering for contemporary brands and private events worldwide.",
+        about_tag: "The Visionary",
+        about_h2: "Salim <br>Daddiadoun",
+        about_lead: "A meticulous observer of light and spatial dynamics, Salim Daddi has established himself as a premier name in high-end event photography.",
+        services_tag: "Expertise",
+        services_h2: "Photography <span class=\"accent-text\">Service</span>",
+        process_h2: "Our Working <span class=\"accent-text\">Blueprint</span>",
+        contact_h2: "Available for <br><span class=\"accent-text\">International</span> Commissions",
+        footer_since: "Documenting Excellence since 2014."
+    },
+    fr: {
+        nav_artist: "L'Artiste",
+        nav_expertise: "Expertise",
+        nav_process: "Processus",
+        nav_inquiry: "Demande",
+        hero_tag: "Depuis 2014",
+        hero_h1: "L'Art de la <br><span class=\"accent-text\">Précision</span>",
+        hero_p: "Ingénierie visuelle haut de gamme pour marques contemporaines et événements privés mondiaux.",
+        about_tag: "Le Visionnaire",
+        about_h2: "Salim <br>Daddiadoun",
+        about_lead: "Observateur méticuleux de la lumière et des dynamiques spatiales, Salim Daddi s'est imposé comme un nom de référence dans la photographie événementielle de luxe.",
+        services_tag: "Expertise",
+        services_h2: "Service <span class=\"accent-text\">Photographie</span>",
+        process_h2: "Notre <span class=\"accent-text\">Méthode</span>",
+        contact_h2: "Disponible pour des <br><span class=\"accent-text\">Missions Internationales</span>",
+        footer_since: "Documenter l'Excellence depuis 2014."
+    },
+    ar: {
+        nav_artist: "الفنان",
+        nav_expertise: "الخبرة",
+        nav_process: "العملية",
+        nav_inquiry: "استفسار",
+        hero_tag: "تأسست عام ٢٠١٤",
+        hero_h1: "فن <br><span class=\"accent-text\">الدقة</span>",
+        hero_p: "هندسة بصرية متطورة للعلامات التجارية المعاصرة والفعاليات الخاصة في جميع أنحاء العالم.",
+        about_tag: "صاحب الرؤية",
+        about_h2: "سليم <br>داديادون",
+        about_lead: "مراقب دقيق للضوء والديناميكيات المكانية، أثبت سليم دادي نفسه كاسم رائد في التصوير الفوتوغرافي للفعاليات الفاخرة.",
+        services_tag: "الخبرة",
+        services_h2: "خدمة <span class=\"accent-text\">التصوير</span>",
+        process_h2: "مخطط <br><span class=\"accent-text\">عملنا</span>",
+        contact_h2: "متاح <br><span class=\"accent-text\">للمهام الدولية</span>",
+        footer_since: "توثيق التميز منذ عام ٢٠١٤."
+    }
+};
+
+function updateContent(lang) {
+    const t = translations[lang];
+
+    // Update direction
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.lang = lang;
+
+    // Update Text Elements
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key]) {
+            el.innerHTML = t[key];
+        }
+    });
+
+    // Update GSAP triggers to refresh positions if needed
+    ScrollTrigger.refresh();
+}
+
 // Loader Sequence
 const loaderProgress = document.querySelector('.loader-progress');
 let progress = 0;
@@ -56,6 +130,16 @@ const interval = setInterval(() => {
 }, 100);
 
 function initEverything() {
+    // Language Switcher Logic
+    const langBtns = document.querySelectorAll('.lang-btn');
+    langBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            langBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateContent(btn.getAttribute('data-lang'));
+        });
+    });
+
     // Hero Parallax
     gsap.to('.parallax-img', {
         scrollTrigger: {
@@ -85,6 +169,7 @@ function initEverything() {
             scrollTrigger: {
                 trigger: item,
                 start: 'top 92%',
+                toggleActions: 'play none none none' // Only play once
             },
             y: 100,
             opacity: 0,
@@ -103,20 +188,22 @@ function initEverything() {
     const navBtn = document.getElementById('navTrigger');
     const menu = document.getElementById('overlayMenu');
 
-    navBtn.addEventListener('click', () => {
-        menu.classList.toggle('active');
-        navBtn.classList.toggle('active');
-        if (menu.classList.contains('active')) {
-            gsap.from('.nav-links li', {
-                y: 100,
-                opacity: 0,
-                duration: 1,
-                stagger: 0.1,
-                ease: 'power4.out',
-                delay: 0.4
-            });
-        }
-    });
+    if (navBtn) {
+        navBtn.addEventListener('click', () => {
+            menu.classList.toggle('active');
+            navBtn.classList.toggle('active');
+            if (menu.classList.contains('active')) {
+                gsap.from('.nav-links li', {
+                    y: 100,
+                    opacity: 0,
+                    duration: 1,
+                    stagger: 0.1,
+                    ease: 'power4.out',
+                    delay: 0.4
+                });
+            }
+        });
+    }
 
     // Link hover scaling for follower
     document.querySelectorAll('a, button').forEach(el => {
